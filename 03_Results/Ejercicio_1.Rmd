@@ -1,0 +1,152 @@
+---
+title: "Ejercicio_1"
+author: "Gabriela Chavez"
+date: "2026-08-11"
+output: html_document
+---
+
+
+### Exercise 1
+
+- Define the initial conditions and parameters for an SEIR model where the total population is 1000, the initial exposed population is 5, the initial infected population is 0, and the initial recovered population is 0. The transmission rate (β) is 0.003, the incubation rate (σ) is 0.2, and the recovery rate (γ) is 0.1. Create the vectors for these initial conditions and parameters in R.
+```{r conditions,}
+initial_conditions <- c(S=995, E=5, I=0, R=0)
+
+initial_conditions
+```
+
+```{r parameters}
+parameters <- c( beta=0.003, sigma=0.2, gamma=0.1)
+parameters
+
+```
+
+### Exercise 2
+
+- Write an R function called seir_model that represents the differential equations for the SEIR model. Use the structure of the SIR model function provided in the lesson and the SEIR conceptual diagram below as a reference.
+```{r funcion}
+seir_model <- function(time, state, parameters){
+   with(as.list(c(state,parameters)), {
+     dS <- -beta * S * E
+     dE <- beta * S * I  - sigma * E
+     dI <- sigma * E  - gamma * I
+     dR <- gamma * I
+     
+  list(c(dS,dE,dI,dR))
+  })
+}
+
+```
+
+### Exercise 3
+
+- Use the ode function from the {deSolve} package to solve the differential equations for the initial conditions and parameters defined in Exercise 1. Set the time span for the simulation to 50 days.
+```{r ode}
+library(deSolve)
+time <- seq(1, 50, by=1)
+seir_out <- ode(
+  # inital state
+  y = initial_conditions,
+  # sequence of time points
+  times = time,
+  # model function
+  func = seir_model, 
+  # parameters in the model
+  parms = parameters
+)
+```
+
+### Exercise 4
+
+Visualize the results of the SEIR model solution from Exercise 3 using ggplot2. Plot the number of susceptible, exposed, infected, and recovered individuals over time on the same graph with different colors for each compartment.
+```{r plot}
+library(ggplot2)
+seir_outs <- as.data.frame(seir_out)
+seir_outs
+seir_plot <- ggplot(seir_outs, aes(x=time)) +
+  geom_line(aes(y= S, color ="Susceptible"))+
+  geom_line(aes(y=I, color ="Infectous"))+
+  geom_line(aes(y=E, color= "Exposed"))+
+  geom_line(aes(y=R, color = "Recovered")) +
+  labs(title = "SEIR Model Simulation", x = "Days", y = "Population") 
+  
+seir_plot 
+```
+
+### ¿Qué condición debe cumplirse para que el número de personas infecciosas aumente al inicio del brote?
+**R:** B tiene que ser alta y que toda la población sea susceptible, pues si hay una tasa de transmisión muy baja la probabilidad de que el número de personas aumente es muy baja
+
+### Calcula R_0 usando los valores de beta, gamma y N de la simulación
+```{r r0}
+
+R0 <- parameters["beta"]/parameters["gamma"]
+R0
+```
+### Calcula la proporción crítica de personas susceptibles
+```{r invr0}
+ps <- 1/R0
+ps
+```
+
+
+### Consideras que el modelo SIR representa adecuadamente el brote obrservado, argumenta tu respuesta
+**R:** Si bien el brote SIR es bueno, este tiene muchas limitaciones, por lo que considero que no termina de representar adecuadamente el brote
+### Identifica los supuestos del modelo SIR/propón un cambio en el modelo
+ En esto modelo los supuestos son:
+ - No hay mortalidad asociada
+ - Una vez recuperado ya no es susceptible 
+ - Todos los susceptibles son infectados
+
+**Posible mejora**
+- Considerar que no todos los susceptibles se van a infectar
+
+### Ejecuta el modelo SEIR construído en los ejercicios anteriores
+#### Modifica el parámetro sigma usando, por ejemplo, sigma=0.1,0,2,0.5
+#### Para el cada valor registra:
+-El día del pico de infecciosos
+-El número máximo de infecciosos;
+-La duración del brote
+
+```{r, include=FALSE}
+param <- c( beta=0.003, sigma=0.5, gamma=0.1)
+seir_out <- ode(
+  # inital state
+  y = initial_conditions,
+  # sequence of time points
+  times = time,
+  # model function
+  func = seir_model, 
+  # parameters in the model
+  parms = param
+)
+seirs1 <- as.data.frame(seir_out)
+
+library(ggplot2)
+seir_plot1 <- ggplot(seirs1, aes(x=time)) +
+  geom_line(aes(y= S, color ="Susceptible"))+
+  geom_line(aes(y=I, color ="Infectous"))+
+  geom_line(aes(y=E, color= "Exposed"))+
+  geom_line(aes(y=R, color = "Recovered")) +
+  labs(title = "SEIR Model Simulation", x = "Days", y = "Population") 
+  
+seir_plot1
+
+
+```
+```{r dataframe, echo=FALSE}
+
+Names <- c("Sigma", "día pico de infecc", "num máx de infecc", "duración del brote")
+sig01 <- c(0.1, 25, 100, 35)
+sig02 <- c(0.2, 15, 187, 40 )
+sig05 <- c(0.5, 12, 470, 36 )
+df <- rbind (sig01,sig02,sig05)
+df <- as.data.frame(df)
+Names -> colnames(df)
+df
+```
+
+### Cómo cambia la curva epidemica cuando aumenta o disminuye el periodo de incubación
+**R:** Al aumentar el tiempo de incubación el día pico de infecciosos se da más pronto, así como el número máximo de infecciosos aumenta , mientras que ao¿l disminuirlo se refleja lo contrario.
+### ¿Crees que agregar un periodo de incubación modifica únicamente el momento y la velocidad del brote o también su umbral epidemico?
+**R:**Tiene un impacto también el umbral epidémico, pues puede tratar de descifrar el patrón que ocurrirá
+

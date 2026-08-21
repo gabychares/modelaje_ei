@@ -1,0 +1,67 @@
+---
+title: "Codigo para una enfermedad frecuensodependiente"
+author: "Gabriela Chavez"
+date: "2026-08-18"
+output: html_document
+---
+
+```{r conditions,}
+initial_conditions <- c(S=995, E=5, I=0, R=0)
+
+initial_conditions
+```
+
+#### Para que este mismo código modele una enfermedad frecuensodepenendiente se tiene que modificar beta 
+```{r parameters}
+parameters <- c( beta=0.8, sigma=0.2, gamma=0.1, N= 1000)
+parameters
+
+```
+
+```{r function}
+seir_model <- function(time, state, parameters){
+   with(as.list(c(state,parameters)), {
+     dS <- -beta * S * I / N
+     dE <- beta * S * I / N - sigma * E
+     dI <- sigma * E  - gamma * I
+     dR <- gamma * I
+     
+  list(c(dS,dE,dI,dR))
+  })
+}
+```
+
+```{r ode, echo=FALSE}
+library(deSolve)
+time <- seq(1, 50, by=1)
+seir_out <- ode(
+  # inital state
+  y = initial_conditions,
+  # sequence of time points
+  times = time,
+  # model function
+  func = seir_model, 
+  # parameters in the model
+  parms = parameters
+)
+```
+
+
+```{r df, include=FALSE}
+
+seir_outsf <- as.data.frame(seir_out)
+seir_outsf
+```
+
+
+```{r plot, echo=FALSE}
+library(ggplot2)
+seir_plot <- ggplot(seir_outsf, aes(x=time)) +
+  geom_line(aes(y= S, color ="Susceptible"))+
+  geom_line(aes(y=I, color ="Infectous"))+
+  geom_line(aes(y=E, color= "Exposed"))+
+  geom_line(aes(y=R, color = "Recovered")) +
+  labs(title = "SEIR Model Simulation", x = "Days", y = "Population") 
+  
+seir_plot 
+```

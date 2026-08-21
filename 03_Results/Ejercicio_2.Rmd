@@ -1,0 +1,168 @@
+---
+title: "Ejercicio_2"
+author: "Gabriela Chavez"
+date: "2026-08-20"
+output: html_document
+---
+
+### Ejercicio 1:Modifique el modelo SIR con dinámica vital para incluir un compartimento expuesto (E), creando un modelo SEIR.
+
+#### -Initial population: 1000 (with 990 susceptible, 5 exposed, 4 infected, and 1 recovered)
+
+#### -Transmission rate ($\beta$): 0.002
+
+#### -Progression rate from exposed to infected ($\sigma$): 0.1
+
+#### -Recovery rate ($\gamma$): 0.05
+
+#### -Birth/death rate ($\mu$): 0.01
+
+#### -Transmission is density-dependen
+
+#### **Definir las condiciones iniciales y los parametros para el modelo SEIR**
+
+```{r states}
+condiciones_inciales <- c(S = 990, E= 5, I=4, R=1 )
+```
+
+```{r parameters}
+parameters <- c(beta = 0.002, sigma = 0.1, gamma = 0.05, mu = 0.01)
+
+```
+
+#### **Escribe una función en R que represente el modelo SEIR con los nacimientos y muertes**
+
+```{r SEIR}
+seir_model <- function(time, state, parameters){
+   with(as.list(c(state,parameters)), {
+     N <- (S+E+I+R)
+     dS <- mu *N -beta * S  * I - mu * S 
+     dE <- beta * S * I  - sigma * E - mu * E
+     dI <- sigma * E  - gamma * I - mu * I
+     dR <- gamma * I - mu * R
+     
+  list(c(dS,dE,dI,dR))
+  })
+}
+
+```
+
+#### **Resuelve el modelo por 200 días**
+
+```{r func}
+library(deSolve)
+tiempo <- seq(0,200, by=1)
+seirdv <- ode(condiciones_inciales,tiempo,seir_model,parameters)
+seirdv<- as.data.frame(seirdv)
+seirdv
+```
+
+#### **Haz una gráfica con los resultados con ggplot2**
+
+```{r plot}
+library(ggplot2)
+ggplot(seirdv, aes(x=tiempo)) +
+  geom_line(aes(y = S, color= "Susceptible")) +
+  geom_line(aes(y = E, color= "Expuesto"))   +
+  geom_line(aes(y = I, color= "Infectado"))  +
+  geom_line(aes(y = R, color= "Recuperado")) +
+  labs(title = "SEIR Model con nacimientos y muertes", x = "Time (days)", y = "Proportion of Population") +
+  scale_color_manual(values = c("Susceptible" = "turquoise3", "Expuesto" = "navyblue", "Infectado" = "hotpink3", "Recuperado" = "skyblue3")) 
+```
+
+### Ejercicio 2:Modifique el modelo SIR con las dinamicas vitales para crear un modelo SI que solo incluya Susceptible (S) e Infeccioso (I).El modelo debera incorporar muertes inducidas-infección. Es frecuenso-dependiente
+
+#### -Población incial:1000, con 990 susceptibles y 10 infectados
+
+#### -Tasa de transmisión ($\beta$): 0.002
+
+#### -Tasa de muertes induxidas-infección 𝛼:0.02
+
+\####**Definir las condiciones y parametros iniciales**
+
+```{r cond}
+condiciones <- c(S = 990, I = 10)
+parametros <- c(beta = 0.1, alfa = 0.02)
+
+```
+
+\####**Escribir la función**
+
+```{r fun}
+library(deSolve)
+SI <- function(time, states, parameters){
+   with(as.list(c(states,parameters)), {
+
+     dS <-  - (beta * S  * I) 
+     dI <- (beta * S * I) - (alfa * I)
+     
+  list(c(dS,dI))
+  })
+  
+}  
+
+
+```
+
+\####**Resolverlo con 200 personas**\*
+
+```{r sid}
+SID <- ode(condiciones,tiempo,SI,parametros)
+SID <- as.data.frame(SID)
+```
+
+\####**Plot con ggplot2**
+
+```{r}
+library(ggplot2)
+ggplot(SID, aes(x=tiempo)) +
+  geom_line(aes(y = S, color= "Susceptible")) +
+  geom_line(aes(y = I, color= "Infectado"))   +
+
+  labs(title = "SI Model muertes inducidas-infección", x = "Time (days)", y = "Proportion of Population") +
+  scale_color_manual(values = c("Susceptible" = "turquoise3",  "Infectado" = "red4")) 
+```
+
+### Ejercicio 3:  Usando el simulador de modelo SIR, investigue cómo los diferentes valores deα(tasa de mortalidad inducida por infección) afecta la dinámica de la enfermedad. Utilice los siguientes parámetros:
+
+![0.01 alfa](images/0.01%20alfa.png){width="350"}
+
+![0.02 alfa](images/0.02%20alfa-01.png){width="364"}
+
+![0.03 alfa](images/0.03%20alfa.png){width="299"}
+
+![0.04 alfa](images/0.04%20alfa%20.png){width="350"}
+
+![0.05 alfa](images/0.05%20alfa.png){width="347"}
+
+### Ejercicio 4: escribe una función de R llamada seir_vital_dynamics que represente un modelo SIR frecuenso-dependiente que incluya nacimientos/muertes naturales y muertes inducidas por infección.
+
+```{r}
+sir_vital_dynamics <- function(time, states, parameters){
+  with(as.list(c(states,parameters)),{
+       # Calcula total de la población
+    N <- (S + I + R)
+    
+    # Ecuaciones diferenciales
+    dS <- mu * N - beta * S * I - mu * S
+    dI <- beta * S * I/ N - gamma * I - mu * I - alfa*I
+    dR <- gamma * I - mu * R
+    
+     
+  list(c(dS,dI))
+  })
+}
+
+```
+
+### Preguntas:
+
+#### • Para un modelo SIR con demografía y mortalidad inducida por la infección
+##### - Comparen este valor con el RO del modelo SIR básico.
+##### • ¿Por qué la incorporación de mu y alpha modifica R0?
+##### • Umbral de susceptibles
+##### • Calculen la proporción crítica de susceptibles, sc=1/R0. ¿Qué determina este umbral y cómo cambia al incorporar alpha?
+##### • Elección de la estructura del modelo
+##### • Considerando la relación entre el periodo latente y el periodo infeccioso de la varicela.
+• lassiona paturalde la menaria con un modelo SIR o SEIR? Justifiquen su elección con base en
+• Diseño de una intervención

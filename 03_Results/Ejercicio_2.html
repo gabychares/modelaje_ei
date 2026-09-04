@@ -721,16 +721,39 @@ nacimientos/muertes naturales y muertes inducidas por infección.</h3>
 infección</h4>
 <div id="comparen-este-valor-con-el-ro-del-modelo-sir-básico." class="section level5">
 <h5>- Comparen este valor con el RO del modelo SIR básico.</h5>
+<pre class="r"><code>R0 &lt;- parameters[&quot;beta&quot;]/parameters[&quot;gamma&quot;]
+R0</code></pre>
+<pre><code>## beta 
+## 0.04</code></pre>
+<pre class="r"><code>R0DEMO &lt;- ((parameters[&quot;beta&quot;])/(parameters[&quot;gamma&quot;]+parameters[&quot;mu&quot;]+parametros [&quot;alfa&quot;]))
+R0DEMO</code></pre>
+<pre><code>##  beta 
+## 0.025</code></pre>
 </div>
 <div id="por-qué-la-incorporación-de-mu-y-alpha-modifica-r0" class="section level5">
-<h5>• ¿Por qué la incorporación de mu y alpha modifica R0?</h5>
+<h5>• <strong>¿Por qué la incorporación de mu y alpha modifica
+R0?</strong></h5>
+<p><strong>R:</strong> Porque al haber una disminución en la población
+la cantidad de personas que se pueden infectar a partir de un individuo
+son menores.</p>
 </div>
 <div id="umbral-de-susceptibles" class="section level5">
 <h5>• Umbral de susceptibles</h5>
 </div>
-<div id="calculen-la-proporción-crítica-de-susceptibles-sc1r0.-qué-determina-este-umbral-y-cómo-cambia-al-incorporar-alpha" class="section level5">
-<h5>• Calculen la proporción crítica de susceptibles, sc=1/R0. ¿Qué
-determina este umbral y cómo cambia al incorporar alpha?</h5>
+<div id="calculen-la-proporción-crítica-de-susceptibles-sc1r0" class="section level5">
+<h5>• Calculen la proporción crítica de susceptibles, sc=1/R0</h5>
+<pre class="r"><code>SC &lt;- 1/R0
+SC</code></pre>
+<pre><code>## beta 
+##   25</code></pre>
+<pre class="r"><code>SCDEMO &lt;- 1/R0DEMO
+SCDEMO</code></pre>
+<pre><code>## beta 
+##   40</code></pre>
+<p><strong>¿Qué determina este umbral y cómo cambia al incorporar
+alpha?</strong> <strong>R:</strong> Esta se calcula sacando el inverso
+de R0 y al contario de lo que pasa en R0 este aumenta al incorporar
+alfa.</p>
 </div>
 <div id="elección-de-la-estructura-del-modelo" class="section level5">
 <h5>• Elección de la estructura del modelo</h5>
@@ -738,8 +761,19 @@ determina este umbral y cómo cambia al incorporar alpha?</h5>
 <div id="considerando-la-relación-entre-el-periodo-latente-y-el-periodo-infeccioso-de-la-varicela." class="section level5">
 <h5>• Considerando la relación entre el periodo latente y el periodo
 infeccioso de la varicela.</h5>
-<p>• lassiona paturalde la menaria con un modelo SIR o SEIR? Justifiquen
-su elección con base en • Diseño de una intervención</p>
+<p>• <strong>¿es más apropiado representarla con un modelo SIR o SEIR?
+Justifiquen su elección con base en la historia natural de la
+infección.</strong> <strong>R:</strong> SEIR, la varicela tiene un
+periodo de incubación tras la exposición a esta infección, por lo que el
+SEIR al incluir este compartimento es más apropiado</p>
+<p>• Diseño de una intervención -Elijan una intervención para controlar
+la transmisión. <strong>Expliquen qué componente del modelo modificaría
+beta, gamma, S, y predigan cómo cambiarían R0, el umbral de susceptibles
+y la infección</strong> <strong>R:</strong> Utilizar vitaminas que
+ayuden a mejorar el sistema inmune de los individuos susceptibles, el
+componente que se modificaria seria beta, este diminuye y al disminuir
+beta la R0 se ve afectada, siendo incapaz de mantener activa la
+infección en la población.</p>
 </div>
 </div>
 </div>

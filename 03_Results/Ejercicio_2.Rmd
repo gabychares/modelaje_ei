@@ -159,10 +159,42 @@ sir_vital_dynamics <- function(time, states, parameters){
 
 #### • Para un modelo SIR con demografía y mortalidad inducida por la infección
 ##### - Comparen este valor con el RO del modelo SIR básico.
-##### • ¿Por qué la incorporación de mu y alpha modifica R0?
+```{r r0}
+R0 <- parameters["beta"]/parameters["gamma"]
+R0
+
+
+```
+```{r r0demo}
+R0DEMO <- ((parameters["beta"])/(parameters["gamma"]+parameters["mu"]+parametros ["alfa"]))
+R0DEMO
+```
+
+##### • **¿Por qué la incorporación de mu y alpha modifica R0?**
+**R:** Porque al haber una disminución en la población la cantidad de personas que se pueden infectar a partir de un individuo son menores. 
+
 ##### • Umbral de susceptibles
-##### • Calculen la proporción crítica de susceptibles, sc=1/R0. ¿Qué determina este umbral y cómo cambia al incorporar alpha?
+##### • Calculen la proporción crítica de susceptibles, sc=1/R0
+```{r}
+SC <- 1/R0
+SC
+```
+```{r}
+SCDEMO <- 1/R0DEMO
+SCDEMO
+```
+
+**¿Qué determina este umbral y cómo cambia al incorporar alpha?**
+**R:** Esta se calcula sacando el inverso de R0 y al contario de lo que pasa en R0 este aumenta al incorporar alfa.
+
 ##### • Elección de la estructura del modelo
 ##### • Considerando la relación entre el periodo latente y el periodo infeccioso de la varicela.
-• lassiona paturalde la menaria con un modelo SIR o SEIR? Justifiquen su elección con base en
+• **¿es más apropiado representarla con un modelo SIR o SEIR? Justifiquen su elección con base en la historia natural de la infección.**
+**R:** SEIR, la varicela tiene un periodo de incubación tras la exposición a esta infección, por lo que el SEIR al incluir este compartimento es más apropiado 
+
 • Diseño de una intervención
+ -Elijan una intervención para controlar la transmisión.
+ **Expliquen qué componente del modelo modificaría beta, gamma, S, y predigan cómo
+cambiarían R0, el umbral de susceptibles y la infección**
+**R:** Utilizar vitaminas que ayuden a mejorar el sistema inmune de los individuos susceptibles, el componente que se modificaria seria beta, este diminuye y al disminuir beta la R0 se ve afectada, siendo incapaz de mantener activa la infección en la población.
+
